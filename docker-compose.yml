@@ -1,0 +1,76 @@
+version: "2"
+
+services:
+  nginx:
+    build: ./nginx
+    image: evgeniy-khyst/nginx
+    env_file:
+      - ./config.env
+    volumes:
+      - nginx_conf:/etc/nginx/sites
+      - letsencrypt_certs:/etc/letsencrypt
+      - certbot_acme_challenge:/var/www/certbot
+      - ./vhosts:/etc/nginx/vhosts
+      - ./html:/var/www/html
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped
+
+  certbot:
+    build: ./certbot
+    image: evgeniy-khyst/certbot
+    env_file:
+      - ./config.env
+    volumes:
+      - letsencrypt_certs:/etc/letsencrypt
+      - certbot_acme_challenge:/var/www/certbot
+
+  cron:
+    build: ./cron
+    image: evgeniy-khyst/cron
+    environment:
+      COMPOSE_PROJECT_NAME: "${COMPOSE_PROJECT_NAME}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./:/workdir:ro
+    restart: unless-stopped
+  database:
+    container_name: db
+    image: mysql:8.0.19
+    restart: unless-stopped
+    hostname: db
+    domainname: thesecorp.com
+    environment:
+      MYSQL_ROOT_PASSWORD: Abcd#4321
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  phpmyadmin:
+    container_name: db_admin
+    image: phpmyadmin/phpmyadmin:5.0.1
+    restart: unless-stopped
+    hostname: admin
+    domainname: thesecorp.com 
+    environment:
+      PMA_HOST: mysql-server
+      PMA_USER: root
+      PMA_PASSWORD: Abcd#4321
+    ports:
+      - "81:80"
+
+  php:    
+   image: php:7.0-fpm  
+   container_name: php-container  
+   expose:  
+    - 9000  
+   volumes_from:  
+    - nginx
+  
+volumes:
+  mysql-data:
+  nginx_conf:
+    external: true
+  letsencrypt_certs:
+    external: true
+  certbot_acme_challenge:
