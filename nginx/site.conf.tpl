@@ -13,7 +13,7 @@ server {
 
 server {
     listen 81;
-    server_name ${domain} www.${domain};
+    server_name admin.thesecorp.com;
 
     location /.well-known/acme-challenge/ {
         root /var/www/certbot/${domain};
