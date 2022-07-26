@@ -63,7 +63,7 @@ services:
 
   phpmyadmin:
     container_name: db_admin
-    image: phpmyadmin/phpmyadmin:5.0.1
+    image: phpmyadmin/phpmyadmin:latest
     restart: unless-stopped
     environment:
       PMA_HOST: db
