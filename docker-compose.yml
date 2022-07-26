@@ -20,7 +20,7 @@ services:
     env_file:
      - ./config.env
     links:
-      - database
+      - database 
     volumes:
      - ./html:/var/www/html
      - nginx_conf:/etc/nginx/sites
@@ -54,8 +54,8 @@ services:
     container_name: db
     image: mysql:8.0.19
     restart: unless-stopped
-    hostname: db
-    domainname: thesecorp.com
+    ports:
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: Abcd#4321
     volumes:
@@ -65,10 +65,8 @@ services:
     container_name: db_admin
     image: phpmyadmin/phpmyadmin:5.0.1
     restart: unless-stopped
-    hostname: admin
-    domainname: thesecorp.com 
     environment:
-      PMA_HOST: mysql-server
+      PMA_HOST: db
       PMA_USER: root
       PMA_PASSWORD: Abcd#4321
     ports:
